@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>The Pokemon Company</title>
+    <style>
+       body{
+           font-family: Arial;
+           margin: 0;
+       }
+       .pokemon-list{
+           padding: 0;
+           display: flex;
+           flex-wrap: wrap;
+           margin: 0;
+       }
+       .pokemon{
+           padding: 10px;
+           width: 25%;
+           box-sizing: border-box;
+           list-style: none;
+           text-align: center;
+           height: 400px;
+           animation: 3s pokemon;
+       }
+       @keyframes pokemon {
+           0% {
+                opacity: 0;
+           }
+
+           100% {
+               opacity: 1;
+           }
+       }
+       img{
+           width: 100%;
+       }
+    </style>
+</head>
+<body>
+    <ul class="pokemon-list" id="lista">
+    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vibrant.js/1.0.0/Vibrant.min.js"></script>
+    <script>
+        const lista = document.getElementById('lista');
+        const pokemonList = [
+            {
+                name: 'Pikachu',
+                type: 'Electrico'
+            },
+            {
+                name: 'Bulbasaur',
+                type: 'Planta'
+            },
+            {
+                name: 'Charmander',
+                type: 'Fuego'
+            },
+            {
+                name: 'Squirtle',
+                type: 'aqua',
+            }
+        ];
+        
+       /* pokemonList.forEach((pokemon) => {//con foreach se recorre el arreglo que esta en la variable pokemon list y recibe como parametro "pokemon" 
+           const $pokemon = document.createElement('li');//createElement: recibe un parametro el cual va a ser el elemento html que se va a resolver (crear). 
+           $pokemon.textContent = pokemon.name;
+            lista.append($pokemon);//append: agrega al final un elemento que se le asigne.
+       }); */
+
+       function getPokemonList(min, max) { //funcion que itera n numero de peticiones solicitadas al api y los ejecuta llamando a la funcion getPokemon
+            for(i = min; i <= max; i++){
+                getPokemon(i);
+            }
+        }
+
+
+       // CONSUMIENDO LA API 
+
+       //con promesas
+        /* function getPokemon(id){ //id es el parametro que recibe el dato que se le carga en la funcion getPokemon cuando se invoca
+            fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`) //metodo para pedir datos similar a ajax, ftch devuelve una promesa
+            .then((response) => {//la function then recibira los datos del API
+                console.log(response);
+                response.json()//json es una funcion asincrona que necesita tiempo para responder
+                .then((pokemon) => {//then para devolver los datos
+                    console.log(pokemon);
+                    makePokemon(pokemon);
+                })
+            })
+        } */
+
+        //async/await
+        async function getPokemon(id) { //se declara async para decirle a js que es una funcion asincrona.
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`) //await: espera a los datos del fetch y hasta que no esten listos, no se resolvera la variable response. 
+            const pokemon = await response.json();
+            makePokemon(pokemon);
+        }
+        
+        /*--------------------------------------------------------------------------------------------------------*/
+        
+        function makePokemon(pokemon){ //funcion que imprime el nombre e imagen del pokemon en pantalla
+            this.pokemon = document.createElement('li');
+            this.pokemomSprite = document.createElement('img');
+            this.pokemonName = document.createElement('p');
+
+            this.pokemon.className = 'pokemon';
+            this.pokemonName.textContent = pokemon.name;
+
+            this.pokemomSprite.setAttribute('crossOrigin', 'anonymous');
+            this.pokemomSprite.setAttribute('src', pokemon.sprites.front_default);//propiedad del objeto que genera el API (front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png")
+
+
+            this.pokemon.append(this.pokemonName);
+            this.pokemon.append(this.pokemomSprite);
+
+            lista.append(this.pokemon);
+
+            this.pokemomSprite.onload = () => {
+                const vibrant = new Vibrant(this.pokemomSprite);
+                const colors = vibrant.swatches();
+                console.log(colors);
+                
+                this.pokemon.setAttribute('style', `
+                background:
+                    linear-gradient(${colors.Vibrant.getHex()},transparent),
+                    linear-gradient(90deg,${colors.LightVibrant.getHex()},transparent),
+                    linear-gradient(-90deg,${colors.DarkVibrant.getHex()},transparent);
+                `);
+            }
+        }
+     
+        getPokemonList(145, 150);
+        
+       
+    </script>
+</body>
+</html>
